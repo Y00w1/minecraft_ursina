@@ -35,7 +35,7 @@ class Skeleton(NPC, Entity):
                 self.on_cooldown = True
                 invoke(setattr, self, 'on_cooldown', False, delay = self.attack_cooldown)
                 player_health = PlayerSingleton().get_player_health()
-                if player_health > 5:
+                if player_health > 0:
                     player_health -= 5
                     PlayerSingleton().update_health_bar(player_health)
     

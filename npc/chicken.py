@@ -29,7 +29,7 @@ class Chicken(NPC, Entity):
 
         # Check if the chicken has been shot
         if self.shot_flag:
-            self.position -= self.forward * time.dt * self.move_speed
+            self.position -= self.forward * time.dt * self.move_speed * 9
 
             # Rotate away from the player
             direction_to_player = player.position - self.position

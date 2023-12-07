@@ -1,6 +1,5 @@
 from ursina import *
 from ursina.shaders import lit_with_shadows_shader
-from ursina.prefabs.health_bar import HealthBar
 from player import PlayerSingleton
 
 app = Ursina()
