@@ -51,7 +51,6 @@ class Chicken(NPC, Entity):
                 self.rotation_timer = 0.0  # Reset rotation timer
 
     def get_shot(self):
-        # Called when the chicken gets shot
         self.shot_flag = True
         invoke(setattr, self, 'shot_flag', False, delay=0.5)
 
@@ -64,6 +63,13 @@ class Chicken(NPC, Entity):
     def hp(self, value):
         self._hp = value
         if value <= 0:
+            player_health = PlayerSingleton().get_player_health()
+            if player_health is not None:
+                player_health += 20
+                max_health = player_singleton.get_max_player_health()
+                player_health = min(player_health, max_health)
+                player_singleton.update_health_bar(player_health)
+            
             destroy(self)
             return
         self.health_bar.world_scale_x = self.hp / self.max_hp * 1.5

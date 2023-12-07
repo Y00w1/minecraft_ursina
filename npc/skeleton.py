@@ -15,6 +15,8 @@ class Skeleton(NPC, Entity):
         self.bill_texture = load_texture('npc/textures/wither.png')
         self.texture = self.body_texture
         self.y = 1
+        self.attack_cooldown = 1
+        self.on_cooldown = False
     
     def update(self):
         player=self.player
@@ -29,6 +31,13 @@ class Skeleton(NPC, Entity):
         if hit_info.entity == player:
             if dist > 2:
                 self.position += self.forward * time.dt * 50
+            elif not self.on_cooldown:
+                self.on_cooldown = True
+                invoke(setattr, self, 'on_cooldown', False, delay = self.attack_cooldown)
+                player_health = PlayerSingleton().get_player_health()
+                if player_health > 5:
+                    player_health -= 5
+                    PlayerSingleton().update_health_bar(player_health)
     
     def get_shot(self):
         if self._hp <= 0:
