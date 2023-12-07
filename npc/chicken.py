@@ -1,12 +1,13 @@
 from ursina import *
 from npc.npc_interface import NPC
 from player import PlayerSingleton
+from math import atan2, degrees, sqrt
 
 player_singleton = PlayerSingleton()
 
 class Chicken(NPC, Entity):
     def __init__(self, shootables_parent, **kwargs):
-        super().__init__(model='npc/textures/chicken.fbx', parent=shootables_parent, collider='box', scale=0.06, double_sided = True,**kwargs)
+        super().__init__(model='npc/textures/chicken.fbx', parent=shootables_parent, collider='box', scale=0.06, double_sided=True, **kwargs)
         self.health_bar = Entity(parent=self, y=1.2, model='cube', color=color.green, world_scale=(1.5, .1, .1))
         self.max_hp = 50
         self.hp = self.max_hp
@@ -15,22 +16,44 @@ class Chicken(NPC, Entity):
         self.bill_texture = load_texture('npc/textures/chicken.png')
         self.texture = self.body_texture
         self.y = 0.3
-        #self.bill_entity = Entity(parent=self, model='npc/textures/chicken.fbx', scale=(1.1, 1, 1), origin=(-0.5, 0.25, 0), texture=self.bill_texture)
+        self.move_speed = 30.0
+        self.rotation_interval = random.uniform(3, 5)  # Random interval for rotation
+        self.rotation_timer = 0.0
+        self.shot_flag = False  # Flag to indicate if the chicken has been shot
 
     def update(self):
         player = self.player
         dist = distance_xz(player.position, self.position)
-        if dist > 40:
-            return
 
         self.health_bar.alpha = max(0, self.health_bar.alpha - time.dt)
 
-        if dist < 10:  # If player is within a certain range, run away
-            move_speed = 6.0
-            self.position -= self.forward * time.dt * move_speed
+        # Check if the chicken has been shot
+        if self.shot_flag:
+            self.position -= self.forward * time.dt * self.move_speed
 
-            # Optionally, you can add a random rotation to make them move more naturally
-            self.rotation_y += random.uniform(-10, 10) * time.dt
+            # Rotate away from the player
+            direction_to_player = player.position - self.position
+            angle_to_player = atan2(direction_to_player.x, direction_to_player.z)
+            self.rotation_y = degrees(angle_to_player)
+
+            self.rotation_timer = 0.0  # Reset rotation timer
+        else:
+            # Move straight
+            self.position += self.forward * time.dt * self.move_speed
+
+            # Increment rotation timer
+            self.rotation_timer += time.dt
+
+            # Check if it's time to rotate
+            if self.rotation_timer >= self.rotation_interval:
+                self.rotation_y += random.uniform(-180, 180)  # Rotate randomly
+                self.rotation_interval = random.uniform(3, 5)  # Set a new random interval
+                self.rotation_timer = 0.0  # Reset rotation timer
+
+    def get_shot(self):
+        # Called when the chicken gets shot
+        self.shot_flag = True
+        invoke(setattr, self, 'shot_flag', False, delay=0.5)
 
 
     @property

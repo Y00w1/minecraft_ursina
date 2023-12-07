@@ -28,7 +28,13 @@ class Skeleton(NPC, Entity):
         hit_info = raycast(self.world_position + Vec3(0, 1, 0), self.forward, 30, ignore=(self,))
         if hit_info.entity == player:
             if dist > 2:
-                self.position += self.forward * time.dt * 5
+                self.position += self.forward * time.dt * 50
+    
+    def get_shot(self):
+        if self._hp <= 0:
+            return
+        move_distance = 2.0 
+        self.position -= self.forward * move_distance
     
     @property
     def hp(self):

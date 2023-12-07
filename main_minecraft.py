@@ -43,6 +43,7 @@ def shoot():
         invoke(setattr, gun, 'on_cooldown', False, delay=.15)
         if mouse.hovered_entity and hasattr(mouse.hovered_entity, 'hp'):
             mouse.hovered_entity.hp -= 10
+            mouse.hovered_entity.get_shot()
             mouse.hovered_entity.blink(color.red)
 
 from npc.npc_factory import NPCFactory
